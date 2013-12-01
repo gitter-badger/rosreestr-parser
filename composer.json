@@ -1,0 +1,27 @@
+{
+    "name": "getsky/register-locations",
+    "type": "library",
+    "description": "Parser register of locations",
+    "keywords": [ "parser", "register of locations"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "JimmDiGrizli",
+            "email": "getmansk-y@yandex.ru"
+        }
+    ],
+    "require": {
+        "php": ">=5.4"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-develop": "1.0.x-dev"
+        }
+    },
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-0": {
+            "GetSky\\RegisterLocations": "src/"
+        }
+    }
+}
