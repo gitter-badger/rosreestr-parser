@@ -10,20 +10,26 @@ class Parser extends SplDoublyLinkedList
     const DATE = "#[0-9]{2}/[0-9]{2}/[0-9]{4}#";
     const NUMBER = "#№№#";
     const ID_REG = "#[0-9]{7}#";
-
     protected $text;
     protected $region;
     protected $location;
+    protected $locations = [];
 
+    /**
+     * @param LocationInterface $location
+     */
     public function  __construct(LocationInterface $location = null)
     {
         if ($location !== null) {
-            $this->locations = $location;
+            $this->location = $location;
         } else {
-            $this->locations = new Location();
+            $this->location = new Location();
         }
     }
 
+    /**
+     * Generate array with locations
+     */
     public function generation()
     {
         foreach ($this as $link) {
@@ -34,12 +40,18 @@ class Parser extends SplDoublyLinkedList
         }
     }
 
+    /**
+     * Clean text from garbage
+     */
     protected function cleanText()
     {
         $this->text = str_replace(array($this::ROW), array(''), $this->text);
         $this->text = preg_replace($this::PAGES, '', $this->text);
     }
 
+    /**
+     * Fix a region of a file
+     */
     protected function fixedRegion()
     {
         preg_match($this::DATE, $this->text, $date, PREG_OFFSET_CAPTURE);
@@ -53,17 +65,26 @@ class Parser extends SplDoublyLinkedList
         );
     }
 
+    /**
+     * Parse the file and populate an array of locations
+     */
     protected function parser()
     {
         preg_match_all($this::ID_REG, $this->text, $id, PREG_OFFSET_CAPTURE);
 
-        foreach ($id[0] as $key => $string) {
-            echo substr(
+
+        foreach ($id[0] as $key => $value) {
+
+            $location = clone $this->location;
+
+            $string = substr(
                 $this->text,
                 $id[0][$key][1],
                 $id[0][$key + 1][1] - ($id[0][$key][1] + 6)
             );
-            echo '<br/>';
+
+            $location->setUid($value[0]);
+            $locations[] = $location;
         }
     }
 } 
