@@ -8,3 +8,9 @@ $exm = new Parser();
 $exm->push('sample.txt');
 
 $exm->generation();
+
+//print_r($exm->getLocations());
+
+foreach ($exm->getLocations() as $v) {
+    echo $v;
+}

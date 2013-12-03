@@ -11,4 +11,10 @@ interface LocationInterface {
     public function setType($type);
 
     public function setName($name);
+
+    public function setMapCode($mapCode);
+
+    public function setNameVariants($nameVariants);
+
+    public function setRegion($region);
 }
