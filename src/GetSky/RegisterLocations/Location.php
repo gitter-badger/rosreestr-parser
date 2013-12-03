@@ -8,4 +8,19 @@ class Location implements LocationInterface {
     {
         $this->uid = $uid;
     }
+
+    public function setGeom($geom)
+    {
+        $this->geom = $geom;
+    }
+
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
 }
