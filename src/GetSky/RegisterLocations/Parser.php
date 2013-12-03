@@ -54,7 +54,7 @@ class Parser extends SplDoublyLinkedList
     /**
      * Nomenclature of map sheet
      */
-    const MAP = "#[A-Z]-[0-9]{2}-[0-9]{2,3}#";
+    const MAP = "#[A-Z]-[0-9]{2}-[0-9]{1,3}#";
 
     /**
      * Type of settlement
