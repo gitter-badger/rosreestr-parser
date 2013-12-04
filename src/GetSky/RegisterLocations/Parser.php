@@ -13,7 +13,8 @@ class Parser extends SplDoublyLinkedList
     /**
      * Excess lines
      */
-    const ROW = "1\r\n\r\n2\r\n\r\n3\r\n\r\n4\r\n\r\n5\r\n\r\n6\r\n\r\n7";
+    const ROW1 = "1\r\n\r\n2\r\n\r\n3\r\n\r\n4\r\n\r\n5\r\n\r\n6\r\n\r\n7";
+    const ROW2 = "1\r\n\t2\r\n\t3\r\n\t4\r\n\t5\r\n\t6\r\n\t7";
 
     /**
      * New row
@@ -34,7 +35,7 @@ class Parser extends SplDoublyLinkedList
     /**
      * Date of renovation
      */
-    const DATE = "#[0-9]{2}/[0-9]{2}/[0-9]{4}#";
+    const DATE = "#[0-9]{2}[/.][0-9]{2}[/.][0-9]{4}#";
 
     /**
      * Number Number
@@ -49,7 +50,7 @@ class Parser extends SplDoublyLinkedList
     /**
      * Latitude and longitude of the location
      */
-    const LAT_LONG = "#[0-9]{2}° [0-9]{2}' С.Ш. [0-9]{2}° [0-9]{2}' В.Д.#";
+    const LAT_LONG = "#[0-9]{2}° [0-9]{2}' С.Ш.(\r\n\r\n| )[0-9]{2}° [0-9]{2}' В.Д.#";
 
     /**
      * Nomenclature of map sheet
@@ -66,7 +67,18 @@ class Parser extends SplDoublyLinkedList
         'село',
         'пст',
         'город',
-        'пгт'
+        'пгт',
+        'посёлок',
+        'нп',
+        'пос.ж.-д.рзд.',
+        'авиагородок',
+        'пос.ж.-д.ст.',
+        'хутор',
+        'лесной пос.',
+        'ж.-д.ст.(нп)',
+        'выселок',
+        'местечко',
+
     ];
 
     /**
@@ -130,7 +142,11 @@ class Parser extends SplDoublyLinkedList
      */
     protected function cleanText()
     {
-        $this->text = str_replace(array($this::ROW), array(''), $this->text);
+        $this->text = str_replace(
+            array($this::ROW1,$this::ROW2),
+            array(''),
+            $this->text
+        );
         $this->text = preg_replace($this::PAGES, '', $this->text);
     }
 
@@ -216,6 +232,12 @@ class Parser extends SplDoublyLinkedList
      */
     public function convertStringToGeom($string)
     {
+        $string = str_replace(
+            array($this::NEW_ROW.$this::NEW_ROW),
+            array(' '),
+            $string
+        );
+
         $lat = (float)substr($string, 0, 2) + (float)substr($string, 5, 2) / 60;
         $long = (float)substr($string, 16, 2) + (float)substr($string, 21, 2) / 60;
 
@@ -224,9 +246,11 @@ class Parser extends SplDoublyLinkedList
         return $geom;
     }
 
+
     /**
      * @param $string
-     * @return Exception
+     * @return string
+     * @throws \Exception
      */
     public function searchTypeLocation($string)
     {
@@ -239,7 +263,7 @@ class Parser extends SplDoublyLinkedList
                 return $type;
             }
         }
-        return new Exception('Not found type of location!');
+        throw new Exception("Not found type of location in string '{$string}!");
     }
 
     /**
@@ -249,4 +273,4 @@ class Parser extends SplDoublyLinkedList
     {
         return $this->locations;
     }
-} 
+}
