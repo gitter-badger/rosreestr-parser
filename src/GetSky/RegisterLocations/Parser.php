@@ -15,48 +15,38 @@ class Parser extends SplDoublyLinkedList
      */
     const ROW1 = "1\r\n\r\n2\r\n\r\n3\r\n\r\n4\r\n\r\n5\r\n\r\n6\r\n\r\n7";
     const ROW2 = "1\r\n\t2\r\n\t3\r\n\t4\r\n\t5\r\n\t6\r\n\t7";
-
     /**
      * New row
      */
     const NEW_ROW = "\r\n";
-
     /**
      * Substitute newline
      */
     const SUB_NEW_ROW = "|";
-
-
     /**
      * Pages sheets
      */
     const PAGES = "#Стр. [0-9]{1,3} из [0-9]{1,3}#";
-
     /**
      * Date of renovation
      */
     const DATE = "#[0-9]{2}[/.][0-9]{2}[/.][0-9]{4}#";
-
     /**
      * Number Number
      */
     const NUMBER = "#№№#";
-
     /**
      * UID locations
      */
     const ID_REG = "#[0-9]{7}#";
-
     /**
      * Latitude and longitude of the location
      */
     const LAT_LONG = "#[0-9]{2}° [0-9]{2}' С.Ш.(\r\n\r\n| )[0-9]{2}° [0-9]{2}' В.Д.#";
-
     /**
      * Nomenclature of map sheet
      */
     const MAP = "#[A-Z]-[0-9]{2}-[0-9]{1,3}#";
-
     /**
      * Type of settlement
      *
@@ -78,30 +68,30 @@ class Parser extends SplDoublyLinkedList
         'ж.-д.ст.(нп)',
         'выселок',
         'местечко',
-
+        'станица',
+        'аул',
+        'ст.(нп)',
+        'ж.-д.рзд.(нп)',
+        'рзд.(нп)'
     ];
-
     /**
      * Text from a file
      *
      * @var string
      */
     protected $text;
-
     /**
      * Name of the region
      *
      * @var
      */
     protected $region;
-
     /**
      * Object location to create clones
      *
      * @var Location
      */
     protected $location;
-
     /**
      * Array prepared locations
      *
@@ -143,7 +133,7 @@ class Parser extends SplDoublyLinkedList
     protected function cleanText()
     {
         $this->text = str_replace(
-            array($this::ROW1,$this::ROW2),
+            array($this::ROW1, $this::ROW2),
             array(''),
             $this->text
         );
@@ -233,7 +223,7 @@ class Parser extends SplDoublyLinkedList
     public function convertStringToGeom($string)
     {
         $string = str_replace(
-            array($this::NEW_ROW.$this::NEW_ROW),
+            array($this::NEW_ROW . $this::NEW_ROW),
             array(' '),
             $string
         );
@@ -246,7 +236,6 @@ class Parser extends SplDoublyLinkedList
         return $geom;
     }
 
-
     /**
      * @param $string
      * @return string
@@ -256,7 +245,7 @@ class Parser extends SplDoublyLinkedList
     {
         foreach ($this::$typeOfLocations as $type) {
 
-            $position = strpos($string, $type.$this::NEW_ROW);
+            $position = strpos($string, $type . $this::NEW_ROW);
 
             if ($position !== false) {
 
