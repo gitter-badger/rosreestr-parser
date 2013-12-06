@@ -17,4 +17,6 @@ interface LocationInterface {
     public function setNameVariants($nameVariants);
 
     public function setRegion($region);
+
+    public function setDescription($description);
 }

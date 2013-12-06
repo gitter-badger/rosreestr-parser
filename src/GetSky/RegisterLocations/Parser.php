@@ -40,9 +40,14 @@ class Parser extends SplDoublyLinkedList
      */
     const ID_REG = "#[0-9]{7}#";
     /**
-     * Latitude and longitude of the location
+     * Latitude and longitude of the location with description
      */
     const LAT_LONG = "#[0-9]{2}° [0-9]{2}' С.Ш.(\r\n\r\n| )[0-9]{2}° [0-9]{2}' В.Д.#";
+
+    /**
+     * Latitude and longitude of the location without description
+     */
+    const LAT_LONG2 = "#\r\n\r\n\r\n\r\n[0-9]{2}° [0-9]{2}' С.Ш.(\r\n\r\n| )[0-9]{2}° [0-9]{2}' В.Д.#";
     /**
      * Nomenclature of map sheet
      */
@@ -72,7 +77,76 @@ class Parser extends SplDoublyLinkedList
         'аул',
         'ст.(нп)',
         'ж.-д.рзд.(нп)',
-        'рзд.(нп)'
+        'рзд.(нп)',
+        'избы',
+        'останов. пункт',
+        'изба',
+        'казармы',
+        'урочище',
+        'ручей',
+        'озеро',
+        'болото',
+        'река',
+        'острова',
+        'ж.-д. ст.',
+        'гора',
+        'остров',
+        'коса',
+        'пристань',
+        'разъезд',
+        'возвышенность',
+        'летовье',
+        'озёра',
+        'развалины',
+        'обг. пост',
+        'проток',
+        'порог',
+        'ледник',
+        'гряда',
+        'бор',
+        'якор.ст.',
+        'скала',
+        'болота',
+        'тундра',
+        'перекат',
+        'луг',
+        'сопка',
+        'курья',
+        'источник',
+        'летник',
+        'старица',
+        'блок-пост',
+        'горн. массив',
+        'просека',
+        'увал',
+        'хребет',
+        'затон',
+        'залив',
+        'адм-тер',
+        'плёс',
+        'обг.п.',
+        'кордон',
+        'кряж',
+        'район',
+        'пруд',
+        'скалы',
+        'перевал',
+        'бараки',
+        'зимник',
+        'лесничество',
+        'дорога',
+        'пещера',
+        'барак',
+        'заповедник',
+        'канава',
+        'землянка',
+        'горы',
+        'дом',
+        'канал',
+        'мыс',
+        'мель',
+        'межд.аэропорт',
+        'запов.'
     ];
     /**
      * Text from a file
@@ -182,12 +256,32 @@ class Parser extends SplDoublyLinkedList
 
             preg_match($this::LAT_LONG, $string, $coord, PREG_OFFSET_CAPTURE);
             preg_match($this::MAP, $string, $mapCode, PREG_OFFSET_CAPTURE);
+            preg_match($this::LAT_LONG2, $string, $desc, PREG_OFFSET_CAPTURE);
 
             $geom = $this->convertStringToGeom($coord[0][0]);
             $type = $this->searchTypeLocation($string);
+            $description = null;
 
-            $name = trim(
-                str_replace($type, '', substr($string, 0, $coord[0][1]))
+            if (empty($desc)) {
+                $description = trim(
+                    substr(
+                        $string,
+                        strpos($string, $type) + strlen($type),
+                        $coord[0][1] - strpos($string, $type) - strlen($type)
+                    )
+                );
+
+                $string = str_replace(
+                    array($description),
+                    array(' '),
+                    str_replace($type, '', substr($string, 0, $coord[0][1]))
+                );
+            }
+
+            $name = str_replace(
+                array($this::NEW_ROW),
+                array(' '),
+                trim(str_replace($type, '', substr($string, 0, $coord[0][1])))
             );
 
             $nameVariants = str_replace(
@@ -198,13 +292,13 @@ class Parser extends SplDoublyLinkedList
 
             $mapCode = trim($mapCode[0][0]);
 
-
             $location->setUid($value[0]);
             $location->setGeom($geom);
             $location->setType($type);
             $location->setName($name);
             $location->setMapCode($mapCode);
             $location->setNameVariants($nameVariants);
+            $location->setDescription($description);
 
             $this->locations[] = $location;
         }

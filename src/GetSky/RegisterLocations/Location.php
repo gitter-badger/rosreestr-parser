@@ -36,6 +36,10 @@ class Location implements LocationInterface
      * @var
      */
     protected $name;
+      /**
+       * @var
+       */
+    protected $description;
 
     /**
      * @param $uid
@@ -94,6 +98,14 @@ class Location implements LocationInterface
     }
 
     /**
+     * @param $region
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    /**
      * @return string
      */
     public function  __toString()
@@ -104,6 +116,7 @@ class Location implements LocationInterface
             $this->type . "\t" .
             $this->nameVariants . "\t" .
             $this->mapCode . "\t" .
+            $this->description . "\t" .
             $this->region . "\t" .
             $this->geom . "\r\n";
     }
