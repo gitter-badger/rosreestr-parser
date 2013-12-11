@@ -40,6 +40,10 @@ class Location implements LocationInterface
        * @var
        */
     protected $description;
+    /**
+       * @var
+       */
+    protected $dateChange;
 
     /**
      * @param $uid
@@ -98,11 +102,19 @@ class Location implements LocationInterface
     }
 
     /**
-     * @param $region
+     * @param $description
      */
     public function setDescription($description)
     {
         $this->description = $description;
+    }
+
+    /**
+     * @param $dateChange
+     */
+    public function setDateChange($dateChange)
+    {
+        $this->dateChange = $dateChange;
     }
 
     /**
@@ -118,6 +130,7 @@ class Location implements LocationInterface
             $this->mapCode . "\t" .
             $this->description . "\t" .
             $this->region . "\t" .
-            $this->geom . "\r\n";
+            $this->geom . "\t" .
+            $this->dateChange . "\r\n";
     }
 }

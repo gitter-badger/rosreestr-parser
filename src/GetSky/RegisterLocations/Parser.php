@@ -196,6 +196,12 @@ class Parser extends SplDoublyLinkedList
      */
     protected $region;
     /**
+     * Date of the changes
+     *
+     * @var
+     */
+    protected $date;
+    /**
      * Object location to create clones
      *
      * @var Location
@@ -231,7 +237,7 @@ class Parser extends SplDoublyLinkedList
         foreach ($this as $link) {
             $this->text = file_get_contents($link);
             $this->cleanText();
-            $this->fixedRegion();
+            $this->fixedRegionAndDate();
             $this->parser();
         }
     }
@@ -252,10 +258,12 @@ class Parser extends SplDoublyLinkedList
     /**
      * Fix a region of a file
      */
-    protected function fixedRegion()
+    protected function fixedRegionAndDate()
     {
         preg_match($this::DATE, $this->text, $date, PREG_OFFSET_CAPTURE);
         preg_match($this::NUMBER, $this->text, $number, PREG_OFFSET_CAPTURE);
+
+        $this->date = $date[0][0];
 
         $position = $date[0][1] + 10;
         $this->region = trim(
@@ -273,6 +281,7 @@ class Parser extends SplDoublyLinkedList
         header('Content-Type: text/html; charset=utf-8');
 
         $this->location->setRegion($this->region);
+        $this->location->setDateChange($this->date);
 
         foreach ($id[0] as $key => $value) {
 

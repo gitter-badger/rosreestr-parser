@@ -19,4 +19,6 @@ interface LocationInterface {
     public function setRegion($region);
 
     public function setDescription($description);
+
+    public function setDateChange($dateChange);
 }
