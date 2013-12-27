@@ -299,12 +299,12 @@ class Parser extends SplDoublyLinkedList
             $positionFest = $id[0][$key][1];
             $positionSecond = $id[0][$key + 1][1];
             $start = $positionFest + 7;
-            $end = $positionSecond - ($start + 6);
+            $end = $positionSecond - ($start+5);
 
             if ($positionSecond === null) {
-                $string = substr($this->text, $start);
+                $string = mb_substr($this->text, $start);
             } else {
-                $string = substr($this->text, $start, $end);
+                $string = mb_substr($this->text, $start, $end);
             }
 
             preg_match($this::LAT_LONG, $string, $coord, PREG_OFFSET_CAPTURE);
@@ -392,11 +392,11 @@ class Parser extends SplDoublyLinkedList
     {
         foreach ($this::$typeOfLocations as $type) {
 
-            $position = strpos($string, $type . $this::NEW_ROW);
+            $position = strpos($string, $type);
 
             if ($position !== false) {
 
-                return $type;
+                return trim($type);
             }
         }
         throw new Exception("Not found type of location in string '{$string}!");
