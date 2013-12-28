@@ -52,6 +52,12 @@ class Parser extends SplDoublyLinkedList
      * Nomenclature of map sheet
      */
     const MAP = "#[A-Z]-[0-9]{2}-[0-9]{1,3}#";
+
+    /**
+     * Array with errors
+     * @var array
+     */
+    public $errors = [];
     /**
      * Type of settlement
      *
@@ -78,8 +84,18 @@ class Parser extends SplDoublyLinkedList
         'ст.(нп)',
         'ж.-д.рзд.(нп)',
         'рзд.(нп)',
+        'ж.-д.пут.пост',
+        'поселение',
+        'селение',
+        'курортн. пос.',
+        'пос. ост. пункт',
+        'карьер',
+        'плотина',
+        'гряды',
+        'участок',
+        'отд. двор',
+        'казарма',
         'починок',
-
         'избы',
         'останов. пункт',
         'изба',
@@ -242,6 +258,7 @@ class Parser extends SplDoublyLinkedList
     {
 
         $this->locations = [];
+        $this->errors = [];
 
         foreach ($this as $link) {
             $this->text = file_get_contents($link);
@@ -282,6 +299,7 @@ class Parser extends SplDoublyLinkedList
 
     /**
      * Parse the file and populate an array of locations
+     * @throws ErrorParserException
      */
     protected function parser()
     {
@@ -297,9 +315,12 @@ class Parser extends SplDoublyLinkedList
             $location = clone $this->location;
 
             $positionFest = $id[0][$key][1];
-            $positionSecond = $id[0][$key + 1][1];
+            $positionSecond = null;
+            if (!empty($id[0][$key + 1])) {
+                $positionSecond = $id[0][$key + 1][1];
+            }
             $start = $positionFest + 7;
-            $end = $positionSecond - ($start+5);
+            $end = $positionSecond - ($start + 5);
 
             if ($positionSecond === null) {
                 $string = mb_substr($this->text, $start);
@@ -310,6 +331,11 @@ class Parser extends SplDoublyLinkedList
             preg_match($this::LAT_LONG, $string, $coord, PREG_OFFSET_CAPTURE);
             preg_match($this::MAP, $string, $mapCode, PREG_OFFSET_CAPTURE);
             preg_match($this::LAT_LONG2, $string, $desc, PREG_OFFSET_CAPTURE);
+
+            if (empty($coord[0][0])) {
+                $this->errors[] = $string;
+                continue;
+            }
 
             $geom = $this->convertStringToGeom($coord[0][0]);
             $type = $this->searchTypeLocation($string);
@@ -355,6 +381,12 @@ class Parser extends SplDoublyLinkedList
 
             $this->locations[] = $location;
         }
+
+        if (isset($this->errors)) {
+            throw new ErrorParserException(
+                'While working an error occurred. See public parameter is "errors".'
+            );
+        }
     }
 
     /**
@@ -376,7 +408,11 @@ class Parser extends SplDoublyLinkedList
         );
 
         $lat = (float)substr($string, 0, 2) + (float)substr($string, 5, 2) / 60;
-        $long = (float)substr($string, 16, 2) + (float)substr($string, 21, 2) / 60;
+        $long = (float)substr($string, 16, 2) + (float)substr(
+                $string,
+                21,
+                2
+            ) / 60;
 
         $geom = 'POINT(' . $long . ' ' . $lat . ')';
 
@@ -386,7 +422,7 @@ class Parser extends SplDoublyLinkedList
     /**
      * @param $string
      * @return string
-     * @throws \Exception
+     * @throws TypeException
      */
     public function searchTypeLocation($string)
     {
@@ -399,7 +435,9 @@ class Parser extends SplDoublyLinkedList
                 return trim($type);
             }
         }
-        throw new Exception("Not found type of location in string '{$string}!");
+        throw new TypeException(
+            "Not found type of location in string '{$string}!"
+        );
     }
 
     /**

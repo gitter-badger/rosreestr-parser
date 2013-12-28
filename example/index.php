@@ -4,13 +4,19 @@ error_reporting(E_ALL);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use GetSky\RegisterLocations\ErrorParserException;
 use GetSky\RegisterLocations\Parser;
 
 $exm = new Parser();
 
 $exm->push('sample.txt');
 
-$exm->generation();
+try {
+    $exm->generation();
+} catch (ErrorParserException $e) {
+    print_r($exm->errors);
+}
+
 
 //print_r($exm->getLocations());
 
