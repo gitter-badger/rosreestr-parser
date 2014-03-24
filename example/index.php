@@ -14,7 +14,7 @@ $exm->push('sample.txt');
 try {
     $exm->generation();
 } catch (ErrorParserException $e) {
-    print_r($exm->errors);
+  //  print_r($exm->errors);
 }
 
 
