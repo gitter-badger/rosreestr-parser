@@ -66,6 +66,8 @@ class Parser extends SplDoublyLinkedList
     protected static $typeOfLocations = [
         'щель',
         'котловина',
+        'зимовка',
+        'сад.-ог.уч.',
         'коллектор',
         'приют',
         'поляны',
